@@ -1,0 +1,10 @@
+
+- [JPEG](https://en.wikipedia.org/wiki/JPEG)
+- [JPEG standard](itu-t81.pdf)
+- [JFIF file format](jfif3.pdf)
+- [JPEG File Interchange Format](https://en.wikipedia.org/wiki/JPEG_File_Interchange_Format)
+- [Exif standard 2.31](DC-008-Translation-2016-E.pdf)
+- [Huffman coding](https://en.wikipedia.org/wiki/Huffman_coding)
+- [Unraveling the JPEG](https://parametric.press/issue-01/unraveling-the-jpeg/)
+- [Anatomy of a JPEG](https://www.ccoderun.ca/programming/2017-01-31_jpeg/)
+- [JPEG Huffman Coding Tutorial](https://www.impulseadventure.com/photo/jpeg-huffman-coding.html)
