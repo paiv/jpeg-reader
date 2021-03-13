@@ -41,6 +41,7 @@ class JfifReader:
             self.marker = None
             self.data = None
             self.data_to_read = None
+            self.segment_offset = None
 
         def __next__(self):
             return self._read_segment()
@@ -66,6 +67,7 @@ class JfifReader:
 
         def _advance_reader(self):
             if self.state == 0:
+                self.segment_offset = self.reader.tell()
                 xs = self.reader.peek(1)
                 if not xs:
                     raise StopIteration()
@@ -98,7 +100,9 @@ class JfifReader:
                     self.state = 'DataScan'
                 else:
                     self.state = 1
-                    return self._complete_segment()
+                    seg = self._complete_segment()
+                    self.segment_offset = self.reader.tell() - 1
+                    return seg
 
             else:
                 x = self._read1()
@@ -109,8 +113,12 @@ class JfifReader:
                     if x == 0xFF:
                         pass
 
-                    elif x in (0xD8, 0xD9):
+                    elif x == 0xD8:
                         self.state = 0
+                        return self._complete_segment()
+
+                    elif x == 0xD9:
+                        self.state = 9000
                         return self._complete_segment()
 
                     elif x == 0xDA:
@@ -140,13 +148,18 @@ class JfifReader:
                         self.state = 0
                         return self._complete_segment()
 
+                elif self.state == 9000:
+                    raise StopIteration()
+
         def _complete_segment(self):
             (ma, mb), data = self.marker, self.data
             marker = (ma << 8) | mb
             data = bytes(data) if data else None
             self.marker = self.data = None
             self.data_to_read = None
-            return self.parser.parse(marker, data)
+            seg = self.parser.parse(marker, data)
+            seg.offset = self.segment_offset
+            return seg
 
     class _Parser:
         def __init__(self):
@@ -177,9 +190,12 @@ class JpegSegment:
     def __init__(self, marker):
         self.marker = marker
         self.data = None
+        self.offset = None
 
     def __repr__(self):
-        return f'{type(self).__name__}[{self.marker:04X}]'
+        off = self.offset
+        if off is None: off = -1
+        return f'{off:06x}: {type(self).__name__}[{self.marker:04X}]'
 
     def frombytes(marker, data):
         obj = JpegSegment(marker)
@@ -494,6 +510,7 @@ class JpegParser:
                 self.trace(s)
                 image.unprocessed.append(s)
             else:
+                seg.offset = s.offset
                 self.trace(seg)
                 self._process_image_segment(image, seg)
 
