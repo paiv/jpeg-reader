@@ -2,6 +2,8 @@
 paiv JPEG Reader
 ==
 
+[![standwithukraine](https://user-images.githubusercontent.com/196601/174491396-41ace22e-bd2e-4b45-bb91-037067fba664.svg)](https://ukrainewar.carrd.co/)
+
 ```
 usage: jpeg_reader.py [-h] [-d dir] [-o ofile] [-v] infile
 
